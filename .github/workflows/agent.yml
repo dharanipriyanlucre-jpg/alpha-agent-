@@ -1,0 +1,32 @@
+name: Alpha Agent Live Monitor
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: # Allows you to click a button to run it manually
+  schedule:
+    - cron: '0 */30 * * *' # Runs automatically every 30 minutes (Stays under 2000 free mins/month)
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Alpha Agent
+        env:
+          NTFY_URL: ${{ secrets.NTFY_URL }}
+        run: |
+          python agent.py
+          
